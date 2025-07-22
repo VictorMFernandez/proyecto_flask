@@ -17,8 +17,8 @@ class DireccionModel(conexion.Model):
 
 # relaciones
 
-usuarioId = Column(ForeignKey(column='usuarios.id'), 
+    usuarioId = Column(ForeignKey(column='usuarios.id'), 
                     nullable=False, name='usuario_id')
 
 
-__tablename__ = 'direcciones'
+    __tablename__ = 'direcciones'
