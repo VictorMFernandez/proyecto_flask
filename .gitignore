@@ -1,1 +1,5 @@
 entorno_flask
+
+# Entorno de desarrollo para Flask
+# Ignorar archivos de entorno virtual
+# De esta forma agregandole (entorno*) se ignoran todos los archivos que empiecen con "entorno"
