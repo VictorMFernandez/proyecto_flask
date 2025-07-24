@@ -13,6 +13,7 @@ class UsuarioModel(conexion.Model):
     apellido = Column(type_=types.String(100), nullable=False)
     fechaNacimiento = Column(name='fecha_nacimiento', type_=types.Date,)
     correo = Column(type_=types.String(100), unique=True)
+    sexo = Column(type_=types.String(10), nullable=False)
 
 # para indicar como queremos que se llame esta tabla en la base de datos
     __tablename__ = 'usuarios'

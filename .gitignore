@@ -1,4 +1,5 @@
 entorno_flask
+__pycache__
 
 # Entorno de desarrollo para Flask
 # Ignorar archivos de entorno virtual
