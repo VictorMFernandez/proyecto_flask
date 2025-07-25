@@ -4,6 +4,8 @@ from models.usuario import UsuarioModel # apesar que no estemos usando el Usuari
 from models.direcciones import DireccionModel # apesar que no estemos usando el DireccionModel, es necesario importarlo para que se cree la tabla en la base de datos
 from flask_migrate import Migrate
 from datetime import datetime
+from marshmallow import Schema, fields
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 
 app = Flask(__name__)
@@ -20,6 +22,23 @@ conexion.init_app(app)
 
 #Migrate sirve para cokear la base de datos con la aplicacion
 Migrate(app=app, db=conexion)
+
+
+class UsuarioDTO(Schema):
+    nombre = fields.Str(required=True)  # hace la validacion que cumpla con el patron que corresponde al nombre
+    apellido = fields.Str()
+    correo = fields.Email(required=True)  # hace la validacion que cumpla con el patron que corresponde al correo 
+    fechaNacimiento = fields.Date() # hace la validacion que cumpla con el patron que corresponde a la fecha
+    sexo = fields.Str()
+
+class UsuarioModelDto(SQLAlchemyAutoSchema):
+    class Meta:
+        # este model sirve para indicar desde que modelo se va a jalar toda la configuracion de nuestro DTO
+        # en base a las columnas seteara las configuraciones de los Modelos y toda la configuracion de las tablas
+        model = UsuarioModel
+        
+
+
 
 #  before_request se ejecuta antes de cada peticion
 # en este caso se ejecutara antes de cada peticion para inicializar la base de datos
@@ -60,7 +79,16 @@ def crearUsuario():
     try:
         # primero capturamos la informacion con el metodo request.get_json()
         data = request.get_json()
-        nuevoUsuario = UsuarioModel(**data)  # usamos el operador ** para desempaquetar el diccionario data y pasarlo como argumentos al constructor de UsuarioModel
+        # si la informaicon es incorecta nos envia un error 400
+        #validador = UsuarioDTO()
+        validador = UsuarioModelDto()  # inicializamos el validador con el modelo de datos que queremos validar
+        # usamos el validador para validar los datos que nos llegan del cliente
+        # validamos los datos que nos llegan del cliente
+        dataValidada = validador. load(data) # si los datos no son validos, lanzara una excepcion
+
+
+
+        nuevoUsuario = UsuarioModel(**dataValidada)  # usamos el operador ** para desempaquetar el diccionario data y pasarlo como argumentos al constructor de UsuarioModel
         # de esta forma podemos crear un nuevo usuario con los datos que nos llegan del cliente
 
 # de esta forma podemos crear un nuevo usuario con los datos que nos llegan del cliente en datos fijos 
@@ -101,7 +129,7 @@ def crearUsuario():
             'content': error.args
         }, 500
 
-
+##########################  2:47#####################################
 
 
 @app.route('/')

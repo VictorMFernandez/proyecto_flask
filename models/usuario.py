@@ -12,7 +12,7 @@ class UsuarioModel(conexion.Model):
 # si no colocamos el parametro name tonces el nombre de la columna sera el mismo que el nombre del atributo
     apellido = Column(type_=types.String(100), nullable=False)
     fechaNacimiento = Column(name='fecha_nacimiento', type_=types.Date,)
-    correo = Column(type_=types.String(100), unique=True)
+    correo = Column(type_=types.String(100), unique=True , nullable=False)
     sexo = Column(type_=types.String(10), nullable=False)
 
 # para indicar como queremos que se llame esta tabla en la base de datos
