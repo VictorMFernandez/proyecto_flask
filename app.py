@@ -57,26 +57,51 @@ def destionarUsuarios():
 # decorador para crear un endpoint que recibe un usuario y lo crea en la base de datos
 @app.route('/usuario', methods=['POST'])
 def crearUsuario():
-    # primero capturamos la informacion con el metodo request.get_json()
-    data = request.get_json()
-    nuevoUsuario = UsuarioModel(nombre = data.get('nombre'),
-                                apellido = data.get('apellido'),
-                                correo = data.get('correo'),
-                                sexo = data.get('sexo'),
-                                fechaNacimiento = data.get('fechaNacimiento'))
-    # creamos un nuevo usuario con los datos que nos llegan del cliente
-    conexion.session.add(nuevoUsuario)
-    print('Antes del commit',nuevoUsuario.id)
-    # agregamos el nuevo usuario a la sesion de la base de datos
-    # esto no lo guarda en la base de datos, solo lo agrega a la sesion
-    conexion.session.commit()
-    print('despues del commit',nuevoUsuario.id)
+    try:
+        # primero capturamos la informacion con el metodo request.get_json()
+        data = request.get_json()
+        nuevoUsuario = UsuarioModel(**data)  # usamos el operador ** para desempaquetar el diccionario data y pasarlo como argumentos al constructor de UsuarioModel
+        # de esta forma podemos crear un nuevo usuario con los datos que nos llegan del cliente
 
-    return{
-        'message': 'Usuario creado correctamente',
-    }, 201
+# de esta forma podemos crear un nuevo usuario con los datos que nos llegan del cliente en datos fijos 
+# nuevoUsuario = UsuarioModel(nombre = data.get('nombre'),
+#                            apellido = data.get('apellido'),
+#                           correo = data.get('correo'),
+#                          sexo = data.get('sexo'),
+#                         fechaNacimiento = data.get('fechaNacimiento'))
+        # creamos un nuevo usuario con los datos que nos llegan del cliente
+        conexion.session.add(nuevoUsuario)
+        print('Antes del commit',nuevoUsuario.id)
+        # agregamos el nuevo usuario a la sesion de la base de datos
+        # esto no lo guarda en la base de datos, solo lo agrega a la sesion
+        conexion.session.commit()
+        print('despues del commit',nuevoUsuario.id)
 
-#########################  1:38 #########################
+        # usuarioCreado es un diccionario que contiene los datos del usuario creado
+        # usamos datetime.strftime para convertir la fecha de nacimiento a un string con el formato YYYY-MM-DD
+        # esto es necesario porque la fecha de nacimiento es un objeto datetime y queremos enviarla como un string
+        # si no lo hacemos, Flask no sabe como serializar el objeto datetime a JSON
+        usuarioCreado= {
+            'id': nuevoUsuario.id,
+            'nombre': nuevoUsuario.nombre,
+            'apellido': nuevoUsuario.apellido,   
+            'correo': nuevoUsuario.correo,
+            'sexo': nuevoUsuario.sexo,
+            'fechaNacimiento': datetime.strftime(nuevoUsuario.fechaNacimiento, '%Y-%m-%d')
+        }
+    
+        return{
+            'message': 'Usuario creado correctamente',
+            'content':usuarioCreado
+        }, 201
+    except Exception as error:
+        # si ocurre un error, hacemos un rollback para deshacer los cambios
+        return{
+            'message': 'Error al crear el usuario',
+            'content': error.args
+        }, 500
+
+
 
 
 @app.route('/')
