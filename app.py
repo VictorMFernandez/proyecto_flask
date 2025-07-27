@@ -51,26 +51,28 @@ class UsuarioModelDto(SQLAlchemyAutoSchema):
 def destionarUsuarios():
     # creamos una sesion con Conexion 
     resultado = conexion.session.query(UsuarioModel).all()
+    validador = UsuarioModelDto(many=True)  # inicializamos el validador con el modelo de datos que queremos validar
     # con el metodo all() obtenemos todos los usuarios de la base de datos  
-    usuarios = []
-    # recorremos los usuarios y los agregamos a la lista de usuarios
-    # cada usuario es un diccionario con los campos id, nombre, apellido, correo, sexo y fechaNacimiento
-    # el id es el id del usuario, el nombre es el nombre del usuario, el apellido es el apellido del usuario, el correo es el correo del usuario, el sexo es el sexo del usuario y la fechaNacimiento es la fecha de nacimiento del usuario
-    # el resultado es una lista de objetos UsuarioModel, por lo que debemos recorrerla y convertirla a diccionarios
-    for usuario in resultado:
-        usuarios.append({
-            'id': usuario.id,
-            'nombre': usuario.nombre,
-            'apellido': usuario.apellido,
-            'correo': usuario.correo,
-            'sexo': usuario.sexo,
-            'fechaNacimiento': datetime.strftime(usuario.fechaNacimiento, '%Y-%m-%d') # convertimos la fecha de nacimiento a un string con el formato YYYY-MM-DD
-            # si quisieramos la hora tambien, podriamos usar '%H:%M:%S'
-        })
-    #print(usuarios)
+    usuarios = validador.dump(resultado)  # usamos el metodo dump del validador para convertir la lista de objetos UsuarioModel a una lista de diccionarios
+    # usuarios = []
+    # # recorremos los usuarios y los agregamos a la lista de usuarios
+    # # cada usuario es un diccionario con los campos id, nombre, apellido, correo, sexo y fechaNacimiento
+    # # el id es el id del usuario, el nombre es el nombre del usuario, el apellido es el apellido del usuario, el correo es el correo del usuario, el sexo es el sexo del usuario y la fechaNacimiento es la fecha de nacimiento del usuario
+    # # el resultado es una lista de objetos UsuarioModel, por lo que debemos recorrerla y convertirla a diccionarios
+    # for usuario in resultado:
+    #     usuarios.append({
+    #         'id': usuario.id,
+    #         'nombre': usuario.nombre,
+    #         'apellido': usuario.apellido,
+    #         'correo': usuario.correo,
+    #         'sexo': usuario.sexo,
+    #         'fechaNacimiento': datetime.strftime(usuario.fechaNacimiento, '%Y-%m-%d') # convertimos la fecha de nacimiento a un string con el formato YYYY-MM-DD
+    #         # si quisieramos la hora tambien, podriamos usar '%H:%M:%S'
+    #     })
+    # #print(usuarios)
 
     return {
-        'content': usuarios
+        'content': usuarios  # usamos el metodo dump del validador para convertir la lista de objetos UsuarioModel a una lista de diccionarios
     }, 200
 
 # decorador para crear un endpoint que recibe un usuario y lo crea en la base de datos
@@ -84,7 +86,8 @@ def crearUsuario():
         validador = UsuarioModelDto()  # inicializamos el validador con el modelo de datos que queremos validar
         # usamos el validador para validar los datos que nos llegan del cliente
         # validamos los datos que nos llegan del cliente
-        dataValidada = validador. load(data) # si los datos no son validos, lanzara una excepcion
+        dataValidada = validador. load(data) # si los datos no son validos, lanzara una excepcion load sirve para validar los datos que nos llegan del cliente
+        # si los datos no son validos, lanzara una excepcion
 
 
 
@@ -109,14 +112,20 @@ def crearUsuario():
         # usamos datetime.strftime para convertir la fecha de nacimiento a un string con el formato YYYY-MM-DD
         # esto es necesario porque la fecha de nacimiento es un objeto datetime y queremos enviarla como un string
         # si no lo hacemos, Flask no sabe como serializar el objeto datetime a JSON
-        usuarioCreado= {
-            'id': nuevoUsuario.id,
-            'nombre': nuevoUsuario.nombre,
-            'apellido': nuevoUsuario.apellido,   
-            'correo': nuevoUsuario.correo,
-            'sexo': nuevoUsuario.sexo,
-            'fechaNacimiento': datetime.strftime(nuevoUsuario.fechaNacimiento, '%Y-%m-%d')
-        }
+
+        usuarioCreado = validador.dump(nuevoUsuario)  # usamos el metodo dump del validador para convertir el objeto UsuarioModel a un diccionario
+        #usuarioCreado = UsuarioModelDto().dump(nuevoUsuario)  # usamos el metodo dump del validador para convertir el objeto UsuarioModel a un diccionario
+        # el metodo dump convierte el objeto UsuarioModel a un diccionario con los campos id, nombre, apellido, correo, sexo y fechaNacimiento
+        # el id es el id del usuario, el nombre es el nombre del usuario, el apellido es el apellido del usuario, el correo es el correo del usuario, el sexo es el sexo del usuario y la fecha de nacimiento es la fecha de nacimiento del usuario
+
+        # usuarioCreado= {
+        #     'id': nuevoUsuario.id,
+        #     'nombre': nuevoUsuario.nombre,
+        #     'apellido': nuevoUsuario.apellido,   
+        #     'correo': nuevoUsuario.correo,
+        #     'sexo': nuevoUsuario.sexo,
+        #     'fechaNacimiento': datetime.strftime(nuevoUsuario.fechaNacimiento, '%Y-%m-%d')
+        # }
     
         return{
             'message': 'Usuario creado correctamente',
@@ -129,7 +138,23 @@ def crearUsuario():
             'content': error.args
         }, 500
 
-##########################  2:47#####################################
+
+@app.route('/usuario/<int:id>', methods=['GET'])
+def destionarUsuario(id):
+    usuarioEncontrado = conexion.session.query(UsuarioModel).filter_by(id = id).first()# el metodo filter_by nos permite filtrar los resultados de la consulta
+    # usamos el metodo first() para obtener el primer resultado de la consulta
+    if usuarioEncontrado is None:
+        return{
+            'message': 'Usuario no existente',
+        }, 404
+
+    serializador = UsuarioModelDto()
+    resultado = serializador.dump(usuarioEncontrado)
+    return{
+        'content': resultado
+    }, 200
+
+
 
 
 @app.route('/')
