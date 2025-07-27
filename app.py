@@ -139,22 +139,28 @@ def crearUsuario():
         }, 500
 
 
-@app.route('/usuario/<int:id>', methods=['GET'])
+@app.route('/usuario/<int:id>', methods=['GET', 'UPDATE'])
 def destionarUsuario(id):
-    usuarioEncontrado = conexion.session.query(UsuarioModel).filter_by(id = id).first()# el metodo filter_by nos permite filtrar los resultados de la consulta
-    # usamos el metodo first() para obtener el primer resultado de la consulta
-    if usuarioEncontrado is None:
+    if request.method == 'GET':     
+
+        usuarioEncontrado = conexion.session.query(UsuarioModel).filter_by(id = id).first()# el metodo filter_by nos permite filtrar los resultados de la consulta
+        # usamos el metodo first() para obtener el primer resultado de la consulta
+        if usuarioEncontrado is None:
+            return{
+                'message': 'Usuario no existente',
+            }, 404
+
+        serializador = UsuarioModelDto()
+        resultado = serializador.dump(usuarioEncontrado)
         return{
-            'message': 'Usuario no existente',
-        }, 404
-
-    serializador = UsuarioModelDto()
-    resultado = serializador.dump(usuarioEncontrado)
-    return{
-        'content': resultado
-    }, 200
-
-
+            'content': resultado
+        }, 200
+    elif request.method == 'PUT':
+        usuarioEncontrado =  conexion.session.query(UsuarioModel).with_entities(UsuarioModel.id).filter_by(id = id).first() # con este metodo verificamos si el usuario existe
+        if usuarioEncontrado is None:
+            return{
+                'message': 'Usuario no existente',
+            }, 404
 
 
 @app.route('/')
