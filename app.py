@@ -188,7 +188,20 @@ def destionarUsuario(id):
             'message': 'Usuario eliminado correctamente',
         }, 200
     
+@app.route('/usuario/deshabilitar/<int:id>', methods=['DELETE'])
+def alternarUsuarioHabilitado(id):
+    usuarioEncontrado = conexion.session.query(UsuarioModel).filter_by(id = id).first()
+    if usuarioEncontrado is None:
+        return{
+            'message': 'Usuario no existente',
+        }, 404
+    conexion.session.query(UsuarioModel).filter_by(id = id).update({'activo': False})  # actualizamos el campo habilitado a False
 
+    conexion.session.commit()
+
+    return{
+        'message': 'Usuario inhabilitado correctamente',
+    }, 200
 
 @app.route('/')
 def inicical():

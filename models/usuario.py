@@ -13,7 +13,13 @@ class UsuarioModel(conexion.Model):
     apellido = Column(type_=types.String(100), nullable=False)
     fechaNacimiento = Column(name='fecha_nacimiento', type_=types.Date,)
     correo = Column(type_=types.String(100), unique=True , nullable=False)
-    sexo = Column(type_=types.String(10), nullable=False)
+    sexo = Column(type_=types.String(10), server_default='NINGUNO')
+    # server_default='1' indica que cuando se agregue un nuevo registro a la tabla, el valor por defecto sera 1 (True)
+    # esto es util para indicar que el usuario esta activo por defecto
+    #mientras que default=True indica que el valor por defecto sera True
+    # si no colocamos el parametro server_default, entonces el valor por defecto sera None
+    activo = Column(type_=types.Boolean, server_default='1') # cuando agregamos una nueva columna y la tabla ya existe al utilizar un valor por defecto lo que hara sera colorcar a todos los registros ese valor 
+    # para indicar que esta clase es una tabla en la base de datos
 
 # para indicar como queremos que se llame esta tabla en la base de datos
     __tablename__ = 'usuarios'
