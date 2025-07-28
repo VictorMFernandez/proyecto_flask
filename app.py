@@ -139,7 +139,7 @@ def crearUsuario():
         }, 500
 
 
-@app.route('/usuario/<int:id>', methods=['GET', 'UPDATE'])
+@app.route('/usuario/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def destionarUsuario(id):
     if request.method == 'GET':     
 
@@ -161,6 +161,33 @@ def destionarUsuario(id):
             return{
                 'message': 'Usuario no existente',
             }, 404
+        # si el usuario existe, actualizamos sus datos
+        validador = UsuarioModelDto()  # inicializamos el validador con el modelo de datos que queremos validar
+        dataValidada = validador.load(request.get_json())  # validamos los datos que nos llegan del cliente
+        conexion.session.query(UsuarioModel).filter_by(id = id).update(dataValidada)
+        # usamos el metodo update para actualizar los datos del usuario
+
+        conexion.session.commit()  # guardamos los cambios en la base de datos
+        # el metodo commit guarda los cambios en la base de datos
+        return{
+            'message': 'Usuario actualizado correctamente',
+            
+        }, 200
+    elif request.method == 'DELETE':
+        usuarioEncontrado = conexion.session.query(UsuarioModel).filter_by(id = id).first()
+        if usuarioEncontrado is None:
+            return{
+                'message': 'Usuario no existente',
+            }, 404
+        # si el usuario existe, lo eliminamos
+        conexion.session.query(UsuarioModel).filter_by(id = id).delete()
+        # usamos el metodo delete para eliminar el usuario
+        conexion.session.commit()
+        # el metodo commit guarda los cambios en la base de datos
+        return{
+            'message': 'Usuario eliminado correctamente',
+        }, 200
+    
 
 
 @app.route('/')
