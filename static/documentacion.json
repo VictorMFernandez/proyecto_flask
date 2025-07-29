@@ -1,0 +1,254 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API de usuarios con direcciones",
+    "description": "Esta es una API sobre el uso de los usuarios con sus direcciones",
+    "contact": {
+      "email": "ederiveroman@gmail.com",
+      "name": "Eduardo de Rivero"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000"
+    },
+    {
+      "url": "http://127.0.0.1:5000"
+    }
+  ],
+  "tags": [
+    {
+      "name": "usuarios",
+      "description": "Todos los endpoints para trabajar con los usuarios",
+      "externalDocs": {
+        "description": "Para mas info",
+        "url": "https://www.google.com"
+      }
+    },
+    {
+      "name": "direcciones",
+      "description": "Las direcciones de los usuarios"
+    }
+  ],
+  "paths": {
+    "/usuarios": {
+      "get": {
+        "tags": [
+          "usuarios"
+        ],
+        "summary": "Devolvera todos los usuarios creados",
+        "description": "Devolver los usuarios habilitados y no habilitados",
+        "operationId": "getUsuarios",
+        "responses": {
+          "200": {
+            "description": "Operacion exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Usuario"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuario": {
+      "post": {
+        "tags": [
+          "usuarios"
+        ],
+        "summary": "Crea un nuevo usuario",
+        "description": "Endpoint para crear un nuevo usuario",
+        "operationId": "createUsuario",
+        "requestBody": {
+          "description": "La data del nuevo usuario",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string",
+                    "example": "Eduardo"
+                  },
+                  "apellido": {
+                    "type": "string",
+                    "example": "de Rivero"
+                  },
+                  "correo": {
+                    "type": "string",
+                    "example": "ederiveroman@gmail.com"
+                  },
+                  "sexo": {
+                    "type": "string",
+                    "example": "MASCULINO"
+                  },
+                  "fechaNacimiento": {
+                    "type": "string",
+                    "example": "2020-12-12T00:00:00.000Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Usuario creado exitosamente"
+                    },
+                    "content": {
+                      "$ref": "#/components/schemas/Usuario"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/usuario/{id}": {
+      "put": {
+        "tags": [
+          "usuarios"
+        ],
+        "summary": "Actualizar un usuario",
+        "description": "Actualizamos un usuario segun su id",
+        "operationId": "updateUsuario",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id del usuario a actualizar",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "La data del nuevo usuario",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string",
+                    "example": "Eduardo"
+                  },
+                  "apellido": {
+                    "type": "string",
+                    "example": "de Rivero"
+                  },
+                  "correo": {
+                    "type": "string",
+                    "example": "ederiveroman@gmail.com"
+                  },
+                  "sexo": {
+                    "type": "string",
+                    "example": "MASCULINO"
+                  },
+                  "fechaNacimiento": {
+                    "type": "string",
+                    "example": "2020-12-12T00:00:00.000Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuario actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Usuario actualizado exitosamente"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Si el usuario no existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Usuario no existe"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Usuario": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "nombre": {
+            "type": "string",
+            "example": "Eduardo"
+          },
+          "apellido": {
+            "type": "string",
+            "example": "de Rivero"
+          },
+          "correo": {
+            "type": "string",
+            "example": "ederiveroman@gmail.com"
+          },
+          "sexo": {
+            "type": "string",
+            "example": "MASCULINO"
+          },
+          "fechaNacimiento": {
+            "type": "string",
+            "example": "2020-12-12T00:00:00.000Z"
+          }
+        }
+      }
+    }
+  }
+}

@@ -6,13 +6,26 @@ from flask_migrate import Migrate
 from datetime import datetime
 from marshmallow import Schema, fields
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from flask_swagger_ui import get_swaggerui_blueprint # es una funcion que me permite crear la documentacion de la API
+from flask_cors import CORS  # es una libreria que me permite habilitar CORS en la aplicacion
 
+# QUE ES SWAGGER (ES UNA ERRAMIENTA QUE ME PERMITE CREAR LA DOCUMENTACION DE LA API) QUE ESTA EN TODOS LOS PROYECTOS
+swaggerui = get_swaggerui_blueprint(
+    base_url = '/documentacion',  # URL para acceder a la documentacion
+    api_url = '/static/documentacion.json',  # este es el dominio de la configuracion de la API
+    config= {
+        'app_name': 'API de Usuarios',
+            # nombre de la aplicacion que se
+    }
+)
 
 app = Flask(__name__)
+CORS(app=app)
 #print(app.config)
 # el app.config almacenara todas las variables de configuracion de la aplicacion
 # aca inicializamos la conexion a la base de datos
 # al moneto de pasar la aplicacion de flask en esta se encontraras la cadena de coneccion a la BD
+app.register_blueprint(swaggerui)  # registramos el blueprint de swaggerui en la aplicacion
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:ROOT@localhost:3306/alumnos_bd'
 
